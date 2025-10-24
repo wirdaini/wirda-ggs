@@ -44,7 +44,7 @@
 	<nav class="navbar navbar-dark navbar-theme-primary px-4 col-12 d-lg-none">
 		<a class="navbar-brand me-lg-5" href="../../index.html">
 			<img class="navbar-brand-dark" src="{{asset('assets-admin/img/brand/light.svg')}}" alt="Volt logo" />
-			<img class="navbar-brand-light" src="{{asset('/assets-admin/assets/img/brand/dark.svg" alt="Volt logo" />
+			<img class="navbar-brand-light" src="{{asset('/assets-admin/assets/img/brand/dark.svg')}}" alt="Volt logo" />
 		</a>
 		<div class="d-flex align-items-center">
 			<button class="navbar-toggler d-lg-none collapsed" type="button" data-bs-toggle="collapse"
@@ -145,7 +145,7 @@
 						</ul>
 					</div>
 				</li>
-				
+
 				<li class="nav-item">
 					<a href="../../pages/upgrade-to-pro.html"
 						class="btn btn-secondary d-flex align-items-center justify-content-center btn-upgrade-pro">

@@ -7,6 +7,7 @@ use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MahasiswaController;
 use App\Http\Controllers\PelangganController;
+use App\Http\Controllers\UserController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -37,7 +38,7 @@ Route::get('/about', function () {
 Route::get('/home', [HomeController::class, 'index'])
         ->name('home');
 
-Route::get('/wisuda', [PegawaiController::class, 'index']);
+// Route::get('/wisuda', [PegawaiController::class, 'index']);
 
 Route::post('question/store', [QuestionController::class, 'store'])
 		->name('question.store');
@@ -47,3 +48,6 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
 
 Route::resource('pelanggan', PelangganController::class);
 
+Route::delete('/pelanggan/{id}', [PelangganController::class, 'destroy'])->name('pelanggan.destroy');
+
+Route::resource('user', UserController::class);

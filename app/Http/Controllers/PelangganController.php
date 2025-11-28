@@ -9,10 +9,17 @@ class PelangganController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $data['dataPelanggan'] = Pelanggan::all();
-        return view('admin.pelanggan.index', $data);
+        // Daftar kolom yang dapat difilter
+        // Sesuaikan dengan nama input pada form
+        $filterableColumns = ['gender'];
+
+        // Gunakan scope filter untuk memproses query dengan filter
+        $pageData['dataPelanggan'] = Pelanggan::filter($request, $filterableColumns)->paginate(10);
+
+        // Return view dengan data yang sudah dipaginasi
+        return view('admin.pelanggan.index', $pageData);
     }
 
     /**
@@ -81,23 +88,23 @@ class PelangganController extends Controller
      * Remove the specified resource from storage.
      */
     /**
- * Remove the specified resource from storage.
- */
-public function destroy($id)
-{
-    try {
-        // Cari data pelanggan
-        $pelanggan = Pelanggan::findOrFail($id);
+     * Remove the specified resource from storage.
+     */
+    public function destroy($id)
+    {
+        try {
+            // Cari data pelanggan
+            $pelanggan = Pelanggan::findOrFail($id);
 
-        // Hapus data
-        $pelanggan->delete();
+            // Hapus data
+            $pelanggan->delete();
 
-        // Redirect dengan pesan sukses
-        return redirect()->route('pelanggan.index')->with('success', 'Data pelanggan berhasil dihapus!');
+            // Redirect dengan pesan sukses
+            return redirect()->route('pelanggan.index')->with('success', 'Data pelanggan berhasil dihapus!');
 
-    } catch (\Exception $e) {
-        // Redirect dengan pesan error jika gagal
-        return redirect()->route('pelanggan.index')->with('error', 'Gagal menghapus data pelanggan: ' . $e->getMessage());
+        } catch (\Exception $e) {
+            // Redirect dengan pesan error jika gagal
+            return redirect()->route('pelanggan.index')->with('error', 'Gagal menghapus data pelanggan: ' . $e->getMessage());
+        }
     }
-}
 }

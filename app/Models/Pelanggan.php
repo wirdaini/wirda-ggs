@@ -3,6 +3,7 @@ namespace App\Models;
 
 use App\Models\Pelanggan;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
 class Pelanggan extends Model
 {
@@ -16,6 +17,16 @@ class Pelanggan extends Model
         'email',
         'phone',
     ];
+
+    public function scopeFilter(Builder $query, $request, array $filterableColumns): Builder
+    {
+        foreach ($filterableColumns as $column) {
+            if ($request->filled($column)) {
+                $query->where($column, $request->input($column));
+            }
+        }
+        return $query;
+    }
 
     public function store(Request $request)
     {
@@ -33,4 +44,5 @@ class Pelanggan extends Model
 
         return redirect()->route('pelanggan.index')->with('success', 'Penambahan Data Berhasil!');
     }
+
 }

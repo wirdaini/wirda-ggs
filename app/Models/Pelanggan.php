@@ -2,8 +2,8 @@
 namespace App\Models;
 
 use App\Models\Pelanggan;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 class Pelanggan extends Model
 {
@@ -43,6 +43,13 @@ class Pelanggan extends Model
         Pelanggan::create($data);
 
         return redirect()->route('pelanggan.index')->with('success', 'Penambahan Data Berhasil!');
+    }
+
+    // ✅ MODIFIKASI: Tambah relasi ke multipleuploads
+    public function files()
+    {
+        return $this->hasMany(\App\Models\Multipleuploads::class, 'ref_id')
+            ->where('ref_table', 'pelanggan');
     }
 
 }

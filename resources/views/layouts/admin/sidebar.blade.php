@@ -9,6 +9,7 @@
         </div>
     </nav>
 
+
     <nav id="sidebarMenu" class="sidebar d-lg-block bg-gray-800 text-white collapse" data-simplebar>
         <div class="sidebar-inner px-4 pt-3">
             <div class="user-card d-flex d-md-none align-items-center justify-content-between justify-content-md-center pb-4">
@@ -67,6 +68,7 @@
                     </a>
                 </li>
 
+
                 {{-- menu user --}}
                 <li class="nav-item  {{ request()->routeIs('user.*') ? 'active' : '' }}">
                     <a href="{{ route('user.index') }}" class="nav-link">
@@ -79,6 +81,7 @@
                     </a>
                 </li>
 
+
                 <li role="separator" class="dropdown-divider mt-4 mb-3 border-gray-700"></li>
                 <li class="nav-item">
                     <a href="https://themesberg.com/docs/volt-bootstrap-5-dashboard/getting-started/quick-start/" target="_blank" class="nav-link d-flex align-items-center">
@@ -90,6 +93,8 @@
                         <span class="sidebar-text">Documentation <span class="badge badge-sm bg-secondary ms-1 text-gray-800">v1.4</span></span>
                     </a>
                 </li>
+
+
 
 
                 <li class="nav-item">
@@ -105,3 +110,6 @@
             </ul>
         </div>
     </nav>
+
+
+

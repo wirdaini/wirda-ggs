@@ -50,9 +50,10 @@ class PelangganController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Pelanggan $pelanggan)
+    public function show($id)
     {
-        //
+        $pelanggan = Pelanggan::with('files')->findOrFail($id);
+        return view('admin.pelanggan.show', compact('pelanggan'));
     }
 
     /**

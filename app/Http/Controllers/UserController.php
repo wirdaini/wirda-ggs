@@ -1,10 +1,10 @@
 <?php
 namespace App\Http\Controllers;
-
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+
 
 class UserController extends Controller
 {
@@ -13,9 +13,10 @@ class UserController extends Controller
      */
     public function index()
     {
-        $dataUser = User::paginate(10);
-        return view('admin.user.index', compact('dataUser'));
+        $user = User::orderBy('created_at', 'desc')->paginate(10);
+        return view('admin.user.index', compact('user'));
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -25,139 +26,120 @@ class UserController extends Controller
         return view('admin.user.create');
     }
 
+
     /**
-     * Store a newly created resource in storage.
+     * Simpan user baru
      */
     public function store(Request $request)
     {
-        // Validasi dengan rules yang diminta
-        $validated = $request->validate([
-            'name'            => 'required|string|max:100',
-            'email'           => 'required|email|unique:users,email',
-            'password'        => 'required|min:8|confirmed',
-            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // ✅ TAMBAH VALIDASI
-        ], [
-            'name.required'         => 'Nama harus diisi',
-            'name.max'              => 'Nama maksimal 100 karakter',
-            'email.required'        => 'Email harus diisi',
-            'email.email'           => 'Format email tidak valid',
-            'email.unique'          => 'Email sudah digunakan',
-            'password.required'     => 'Password harus diisi',
-            'password.min'          => 'Password minimal 8 karakter',
-            'password.confirmed'    => 'Konfirmasi password tidak cocok',
-            'profile_picture.image' => 'File harus berupa gambar', // ✅ TAMBAH PESAN ERROR
-            'profile_picture.mimes' => 'Format gambar harus jpeg, png, jpg, atau gif',
-            'profile_picture.max'   => 'Ukuran gambar maksimal 2MB',
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|min:6',
+            'role' => 'required|in:Super Admin,Administrator,Pelanggan,Mitra', // ✅ TAMBAH VALIDASI ROLE
+            'profile_picture' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
-        try {
-            $data             = $validated;
-            $data['password'] = Hash::make($request->password);
 
-            // ✅ HANDLE PROFILE PICTURE UPLOAD
-            if ($request->hasFile('profile_picture')) {
-                $profilePicturePath      = $request->file('profile_picture')->store('profile_pictures', 'public');
-                $data['profile_picture'] = $profilePicturePath;
-            }
+        // Cara Manual (Lebih aman memastikan data masuk)
+        $user = new User();
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->password = Hash::make($request->password);
+        $user->role = $request->role; // ✅ TAMBAH ROLE
 
-            User::create($data);
 
-            return redirect()->route('user.index')->with('success', 'Data user berhasil ditambahkan!');
-
-        } catch (\Exception $e) {
-            return redirect()->route('user.create')
-                ->with('error', 'Gagal menambahkan data user: ' . $e->getMessage())
-                ->withInput();
+        // Upload foto jika ada
+        if ($request->hasFile('profile_picture')) {
+            $path = $request->file('profile_picture')->store('profile_pictures', 'public');
+            $user->profile_picture = $path;
         }
+
+
+        $user->save(); // Simpan ke database
+
+
+        return redirect()->route('user.index')->with('success', 'User berhasil ditambahkan');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
 
     /**
-     * Show the form for editing the specified resource.
+     * Form edit data user
      */
-    public function edit(string $id)
+    public function edit($id)
     {
-        $dataUser = User::findOrFail($id);
-        return view('admin.user.edit', compact('dataUser'));
+        $user = User::findOrFail($id);
+        return view('admin.user.edit', compact('user'));
     }
 
+
     /**
-     * Update the specified resource in storage.
+     * Update data user
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $id)
     {
-        // Validasi dengan rules yang diminta
-        $validated = $request->validate([
-            'name'            => 'required|string|max:100',
-            'email'           => 'required|email|unique:users,email,' . $id,
-            'password'        => 'sometimes|min:8|confirmed',
-            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // ✅ TAMBAH VALIDASI
-        ], [
-            'name.required'         => 'Nama harus diisi',
-            'name.max'              => 'Nama maksimal 100 karakter',
-            'email.required'        => 'Email harus diisi',
-            'email.email'           => 'Format email tidak valid',
-            'email.unique'          => 'Email sudah digunakan',
-            'password.min'          => 'Password minimal 8 karakter',
-            'password.confirmed'    => 'Konfirmasi password tidak cocok',
-            'profile_picture.image' => 'File harus berupa gambar',
-            'profile_picture.mimes' => 'Format gambar harus jpeg, png, jpg, atau gif',
-            'profile_picture.max'   => 'Ukuran gambar maksimal 2MB',
+        $user = User::findOrFail($id);
+
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $id,
+            'password' => 'nullable|min:6', // Password boleh kosong saat edit
+            'role' => 'required|in:Super Admin,Administrator,Pelanggan,Mitra', // ✅ TAMBAH VALIDASI ROLE
+            'profile_picture' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
-        try {
-            $user = User::findOrFail($id);
-            $data = $validated;
 
-            // Jika password diisi, gunakan Hash::make()
-            if ($request->filled('password')) {
-                $data['password'] = Hash::make($request->password);
-            } else {
-                unset($data['password']);
-            }
+        // 1. Update data dasar
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->role = $request->role; // ✅ TAMBAH UPDATE ROLE
 
-            // ✅ HANDLE PROFILE PICTURE UPLOAD
-            if ($request->hasFile('profile_picture')) {
-                // Delete old picture if exists
-                if ($user->profile_picture) {
-                    Storage::disk('public')->delete($user->profile_picture);
-                }
 
-                $profilePicturePath      = $request->file('profile_picture')->store('profile_pictures', 'public');
-                $data['profile_picture'] = $profilePicturePath;
-            }
-
-            $user->update($data);
-
-            return redirect()->route('user.index')->with('success', 'Data user berhasil diupdate!');
-
-        } catch (\Exception $e) {
-            return redirect()->route('user.edit', $id)
-                ->with('error', 'Gagal mengupdate data user: ' . $e->getMessage())
-                ->withInput();
+        // 2. Cek apakah password diisi? Kalau ya, update. Kalau tidak, biarkan lama.
+        if ($request->filled('password')) {
+            $user->password = Hash::make($request->password);
         }
+
+
+        // 3. Logika Upload Foto
+        if ($request->hasFile('profile_picture')) {
+            // Hapus foto lama jika ada & filenya eksis di storage
+            if ($user->profile_picture && Storage::disk('public')->exists($user->profile_picture)) {
+                Storage::disk('public')->delete($user->profile_picture);
+            }
+            // Simpan foto baru
+            $path = $request->file('profile_picture')->store('profile_pictures', 'public');
+
+
+            // Set path baru ke database
+            $user->profile_picture = $path;
+        }
+        $user->save(); // <--- PENTING: Method save() ini memaksa penyimpanan
+        return redirect()->route('user.index')->with('success', 'User berhasil diperbarui');
     }
 
+
     /**
-     * Remove the specified resource from storage.
+     * Hapus user
      */
-    public function destroy(string $id)
+    public function destroy($id)
     {
-        try {
-            $user = User::findOrFail($id);
-            $user->delete();
+        $user = User::findOrFail($id);
 
-            return redirect()->route('user.index')->with('success', 'Data user berhasil dihapus!');
 
-        } catch (\Exception $e) {
-            return redirect()->route('user.index')->with('error', 'Gagal menghapus data user: ' . $e->getMessage());
+        // Hapus file foto jika ada
+        if ($user->profile_picture && Storage::disk('public')->exists($user->profile_picture)) {
+            Storage::disk('public')->delete($user->profile_picture);
         }
+
+
+        $user->delete();
+
+
+        return redirect()->route('user.index')->with('success', 'User berhasil dihapus');
     }
 }
+
+
+

@@ -58,17 +58,48 @@
             <div class="card border-0 shadow mb-4">
                 <div class="card-body">
                     <div class="table-responsive">
+                        <form method="GET" action="{{ route('user.index') }}" onchange="this.form.submit()" class="mb-3">
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <select name="role" class="form-select">
+                                        <option value="">All Role</option>
+                                        <option value="Super Admin" {{ request('role') == 'Super Admin' ? 'selected' : '' }}>Super Admin</option>
+                                        <option value="Administrator" {{ request('role') == 'Administrator' ? 'selected' : '' }}>Administrator</option>
+                                        <option value="Pelanggan" {{ request('role') == 'Pelanggan' ? 'selected' : '' }}>Pelanggan</option>
+                                        <option value="Mitra" {{ request('role') == 'Mitra' ? 'selected' : '' }}>Mitra</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <div class="input-group">
+                                        <input type="text" name="search" class="form-control" id="exampleInputIconRight"
+                                            value="{{ request('search') }}" placeholder="Search" aria-label="Search">
+                                        <button type="submit" class="input-group-text" id="basic-addon2">
+                                            <svg class="icon icon-xxs" fill="currentColor" viewBox="0 0 20 20"
+                                                xmlns="http://www.w3.org/2000/svg">
+                                                <path fill-rule="evenodd"
+                                                    d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                                                    clip-rule="evenodd"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+
                         <table id="table-user" class="table table-centered table-nowrap mb-0 rounded">
                             <thead class="thead-light">
                                 <tr>
-                                    <th class="border-0">Profile</th> <!-- ✅ TAMBAH KOLOM INI -->
+                                    <th class="border-0">Profile</th>
                                     <th class="border-0">Name</th>
                                     <th class="border-0">Email</th>
+                                    <th class="border-0">Password</th>
+                                    <th class="border-0">Role</th>
                                     <th class="border-0 rounded-end">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($dataUser as $item)
+                                @foreach ($user as $item)
                                     <tr>
                                         <td>
                                             @if ($item->profile_picture)
@@ -83,8 +114,18 @@
                                         <td>{{ $item->name }}</td>
                                         <td>{{ $item->email }}</td>
                                         <td>
+                                            <!-- TAMPILKAN PASSWORD HASH -->
+                                            <div style="font-family: monospace; font-size: 10px;">
+                                                {{ $item->password }}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {{ $item->role }}
+                                        </td>
+                                        <td>
                                             <div class="d-flex gap-1">
-                                                <a href="{{ route('user.edit', $item->id) }}" class="btn btn-info btn-sm">
+                                                <a href="{{ route('user.edit', $item->id) }}"
+                                                    class="btn btn-info btn-sm">
                                                     <svg class="icon icon-xs me-1" data-slot="icon" fill="none"
                                                         stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24"
                                                         xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -95,9 +136,9 @@
                                                     Edit
                                                 </a>
 
-                                                <form action="{{ route('user.destroy', $item->id) }}" method="POST"
-                                                    style="display:inline"
-                                                    onsubmit="return confirm('Apakah Anda yakin ingin menghapus user ini?')">
+                                                <form action="{{ route('user.destroy', $item->id) }}"
+                                                    method="POST" style="display:inline"
+                                                    onsubmit="return confirm('Apakah Anda yakin ingin menghapus data ini?')">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-danger btn-sm">
@@ -119,12 +160,11 @@
                         </table>
 
                         <div class="mt-3">
-                            {{ $dataUser->links('pagination::bootstrap-5') }}
+                            {{ $user->links('pagination::bootstrap-5') }}
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    </body>
 @endsection

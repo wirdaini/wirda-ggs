@@ -63,8 +63,8 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('user.update', $dataUser->id) }}" method="POST" enctype="multipart/form-data">
-                        enctype="multipart/form-data"> @csrf
+                    <form action="{{ route('user.update', $user->id) }}" method="POST" enctype="multipart/form-data">
+                        @csrf
                         @method('PUT')
                         <div class="row mb-4">
                             <div class="col-lg-6 col-sm-6">
@@ -72,14 +72,14 @@
                                 <div class="mb-3">
                                     <label for="name" class="form-label">Name</label>
                                     <input type="text" name="name" id="name" class="form-control" required
-                                        value="{{ $dataUser->name }}">
+                                        value="{{ old('name', $user->name) }}">
                                 </div>
 
                                 <!-- Email -->
                                 <div class="mb-3">
                                     <label for="email" class="form-label">Email</label>
                                     <input type="email" name="email" id="email" class="form-control" required
-                                        value="{{ $dataUser->email }}">
+                                        value="{{ old('email', $user->email) }}">
                                 </div>
 
                                 <!-- Password -->
@@ -91,8 +91,7 @@
                                     @error('password')
                                         <div class="text-danger small mt-1">{{ $message }}</div>
                                     @enderror
-                                    <small class="text-muted">Biarkan kosong jika tidak ingin mengubah
-                                        password</small>
+                                    <small class="text-muted">Biarkan kosong jika tidak ingin mengubah password</small>
                                 </div>
 
                                 <!-- Password Confirmation -->
@@ -102,22 +101,45 @@
                                         class="form-control" placeholder="Konfirmasi password baru">
                                 </div>
 
+                                {{-- Role --}}
+                                <div class="mb-3">
+                                    <label for="role" class="form-label">Role</label>
+                                    <select name="role" id="role"
+                                        class="form-control @error('role') is-invalid @enderror" required>
+                                        <option value="">Pilih Role</option>
+                                        <option value="Super Admin"
+                                            {{ old('role', $user->role) == 'Super Admin' ? 'selected' : '' }}>Super Admin
+                                        </option>
+                                        <option value="Administrator"
+                                            {{ old('role', $user->role) == 'Administrator' ? 'selected' : '' }}>
+                                            Administrator</option>
+                                        <option value="Pelanggan"
+                                            {{ old('role', $user->role) == 'Pelanggan' ? 'selected' : '' }}>Pelanggan
+                                        </option>
+                                        <option value="Mitra" {{ old('role', $user->role) == 'Mitra' ? 'selected' : '' }}>
+                                            Mitra</option>
+                                    </select>
+                                    @error('role')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
                                 <!-- Profile Picture -->
                                 <div class="mb-3">
                                     <label for="profile_picture" class="form-label">Profile Picture</label>
-                                    <input type="file" name="profile_picture" id="profile_picture" class="form-control"
-                                        accept="image/jpeg,image/png,image/jpg,image/gif">
+                                    <input type="file" name="profile_picture" id="profile_picture"
+                                        class="form-control" accept="image/jpeg,image/png,image/jpg,image/gif">
                                     @error('profile_picture')
                                         <div class="text-danger small mt-1">{{ $message }}</div>
                                     @enderror
                                     <small class="text-muted">Format: JPEG, PNG, JPG, GIF (Maksimal 2MB)</small>
 
                                     <!-- Show current profile picture if exists -->
-                                    @if ($dataUser->profile_picture)
+                                    @if ($user->profile_picture)
                                         <div class="mt-2">
                                             <label class="form-label">Current Picture:</label>
                                             <div>
-                                                <img src="{{ Storage::url($dataUser->profile_picture) }}"
+                                                <img src="{{ Storage::url($user->profile_picture) }}"
                                                     alt="Profile Picture" class="img-thumbnail" width="150">
                                             </div>
                                         </div>
@@ -136,5 +158,4 @@
             </div>
         </div>
     </div>
-    </body>
 @endsection

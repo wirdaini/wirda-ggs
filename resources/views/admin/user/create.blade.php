@@ -104,12 +104,32 @@
                                     <input type="password" name="password_confirmation" id="password_confirmation"
                                         class="form-control" required placeholder="Konfirmasi password">
                                 </div>
+                                
+                                {{-- Role --}}
+                                <div class="mb-3">
+                                    <label for="role" class="form-label">Role</label>
+                                    <select name="role" id="role"
+                                        class="form-control @error('role') is-invalid @enderror" required>
+                                        <option value="">Pilih Role</option>
+                                        <option value="Super Admin" {{ old('role') == 'Super Admin' ? 'selected' : '' }}>
+                                            Super Admin</option>
+                                        <option value="Administrator"
+                                            {{ old('role') == 'Administrator' ? 'selected' : '' }}>Administrator</option>
+                                        <option value="Pelanggan" {{ old('role') == 'Pelanggan' ? 'selected' : '' }}>
+                                            Pelanggan</option>
+                                        <option value="Mitra" {{ old('role') == 'Mitra' ? 'selected' : '' }}>Mitra
+                                        </option>
+                                    </select>
+                                    @error('role')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
 
                                 <!-- Profile Picture -->
                                 <div class="mb-3">
                                     <label for="profile_picture" class="form-label">Profile Picture</label>
-                                    <input type="file" name="profile_picture" id="profile_picture" class="form-control"
-                                        accept="image/jpeg,image/png,image/jpg,image/gif">
+                                    <input type="file" name="profile_picture" id="profile_picture"
+                                        class="form-control" accept="image/jpeg,image/png,image/jpg,image/gif">
                                     @error('profile_picture')
                                         <div class="text-danger small mt-1">{{ $message }}</div>
                                     @enderror
